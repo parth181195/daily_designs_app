@@ -28,7 +28,8 @@ class HomeViewModel extends BaseViewModel {
 
   getPosts() {
     _firebaseService.getFeaturedGraphics().listen((event) {
-      featuredPosts = event.sublist(0, event.length >= 6 ? 6 : event.length);
+      // featuredPosts = event.sublist(0, event.length >= 6 ? 6 : event.length);
+      featuredPosts = event.sublist(0, event.length >= 6 ? event.length : event.length);
       notifyListeners();
       print(event);
     });

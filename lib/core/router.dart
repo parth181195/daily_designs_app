@@ -8,16 +8,25 @@ import 'package:daily_design/ui/views/frame/frame_view.dart';
 import 'package:daily_design/ui/views/frame_selection_view/frame_selection_view.dart';
 import 'package:daily_design/ui/views/home/home_view.dart';
 import 'package:daily_design/ui/views/login/login_view.dart';
+import 'package:daily_design/ui/views/logo_settings/logo_settings_view.dart';
+import 'package:daily_design/ui/views/plans/plan_view.dart';
 import 'package:daily_design/ui/views/profile/profile_view.dart';
+import 'package:daily_design/ui/views/settings/settings_view.dart';
 import 'package:daily_design/ui/views/sign_up/sign_up_view.dart';
 import 'package:daily_design/ui/views/splash/splash_view.dart';
 import 'package:daily_design/ui/views/top_graphics/top_graphics_view.dart';
 
 @MaterialAutoRouter(routes: [
-  MaterialRoute(page: SplashView, initial: true),
+  MaterialRoute(
+    page: SplashView,
+    initial: true,
+  ),
   MaterialRoute(page: LoginView),
   MaterialRoute(page: SignUpView),
   MaterialRoute(page: CategoriesView, guards: [AuthGuard]),
+  MaterialRoute(page: SettingsView, guards: [AuthGuard]),
+  MaterialRoute(page: PlansView, guards: [AuthGuard]),
+  MaterialRoute(page: LogoSettingsView, guards: [AuthGuard]),
   MaterialRoute(page: TopGraphicsView, guards: [AuthGuard]),
   MaterialRoute(page: FrameSelectionView, guards: [AuthGuard]),
   MaterialRoute(page: FramesView, guards: [AuthGuard]),

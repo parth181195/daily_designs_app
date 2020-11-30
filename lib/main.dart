@@ -34,6 +34,7 @@ class _AppRootState extends State<AppRoot> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light().copyWith(textTheme: GoogleFonts.montserratTextTheme()),
+      home: Text('hi'),
       onGenerateRoute: Router().onGenerateRoute,
       builder: ExtendedNavigator<Router>(
         initialRoute: Routes.splashView,

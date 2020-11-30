@@ -163,6 +163,7 @@ class AuthService implements Disposable {
     var data = await _firestore.doc('users/$uid').get();
 
     _userStatic = UserDataModel.fromJson(data.data(), fbUserStatic);
+    return _userStatic;
   }
 
   checkUserObjectFromDb(uid) async {

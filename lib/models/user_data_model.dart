@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class UserDataModel {
   User user;
+  String email;
   String plan;
   String remainingGraphics;
   String mobile;
@@ -16,6 +17,13 @@ class UserDataModel {
   String website;
   String instagramUrl;
   String fcmToken;
+
+  String get safeEmail {
+    if (!(user.email != null && user.email != '')) {
+      return this.email;
+    }
+    return user.email;
+  }
 
   UserDataModel({
     @required this.user,
@@ -34,13 +42,17 @@ class UserDataModel {
 
   UserDataModel.fromJson(Map<String, dynamic> json, User user) {
     this.user = user;
+
+    if (!(user.email != null && user.email != '')) {
+      this.email = json['email'];
+    }
     this.plan = json['plan'];
     this.remainingGraphics = json['remaining_graphics'];
     this.mobile = json['mobile'];
     this.address = json['address'];
     this.logoPath = json['logo_path'];
     this.uid = user.uid;
-    this.name = user.displayName != null ? user.displayName : json['name'];
+    this.name = user.displayName != null && user.displayName != '' ? user.displayName : json['name'];
     this.companyName = json['companyName'];
     this.companyType = json['companyType'];
     this.website = json['website'];
@@ -50,6 +62,9 @@ class UserDataModel {
 
   UserDataModel.fromJsonData(Map<String, dynamic> json, User user) {
     this.user = user;
+    if (!(user.email != null && user.email != '')) {
+      this.email = json['email'];
+    }
     this.plan = json['plan'];
     this.remainingGraphics = json['remaining_graphics'];
     this.mobile = json['mobile'];
@@ -68,12 +83,13 @@ class UserDataModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['remaining_graphics'] = this.remainingGraphics;
     data['plan'] = this.plan;
-    data['email'] = this.user.email;
+
+    data['email'] = user.email != null && user.email != '' ? this.user.email : this.email;
     data['uid'] = this.user.uid;
     data['mobile'] = this.mobile;
     data['address'] = this.address;
     data['logo_path'] = this.logoPath;
-    data['name'] = this.user.displayName != null ? this.user.displayName : this.name;
+    data['name'] = (this.user.displayName != null && this.user.displayName != '') ? this.user.displayName : this.name;
     data['companyName'] = this.companyName;
     data['companyType'] = this.companyType;
     data['website'] = this.website;
@@ -84,9 +100,8 @@ class UserDataModel {
 
   toJsonData() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    // data['remaining_graphics'] = this.remainingGraphics;
-    // data['plan'] = this.plan;
-    data['email'] = this.user.email;
+    // data['remaining_graphics'] = this.remainingGraphics;@TESTY.COM,
+    data['email'] = user.email != null && user.email != '' ? this.user.email : this.email;
     data['uid'] = this.user.uid;
     data['mobile'] = this.mobile;
     data['address'] = this.address;

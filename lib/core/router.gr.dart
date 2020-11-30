@@ -18,7 +18,10 @@ import '../ui/views/frame/frame_view.dart';
 import '../ui/views/frame_selection_view/frame_selection_view.dart';
 import '../ui/views/home/home_view.dart';
 import '../ui/views/login/login_view.dart';
+import '../ui/views/logo_settings/logo_settings_view.dart';
+import '../ui/views/plans/plan_view.dart';
 import '../ui/views/profile/profile_view.dart';
+import '../ui/views/settings/settings_view.dart';
 import '../ui/views/sign_up/sign_up_view.dart';
 import '../ui/views/splash/splash_view.dart';
 import '../ui/views/top_graphics/top_graphics_view.dart';
@@ -29,6 +32,9 @@ class Routes {
   static const String loginView = '/login-view';
   static const String signUpView = '/sign-up-view';
   static const String categoriesView = '/categories-view';
+  static const String settingsView = '/settings-view';
+  static const String plansView = '/plans-view';
+  static const String logoSettingsView = '/logo-settings-view';
   static const String topGraphicsView = '/top-graphics-view';
   static const String frameSelectionView = '/frame-selection-view';
   static const String framesView = '/frames-view';
@@ -40,6 +46,9 @@ class Routes {
     loginView,
     signUpView,
     categoriesView,
+    settingsView,
+    plansView,
+    logoSettingsView,
     topGraphicsView,
     frameSelectionView,
     framesView,
@@ -57,6 +66,10 @@ class Router extends RouterBase {
     RouteDef(Routes.loginView, page: LoginView),
     RouteDef(Routes.signUpView, page: SignUpView),
     RouteDef(Routes.categoriesView, page: CategoriesView, guards: [AuthGuard]),
+    RouteDef(Routes.settingsView, page: SettingsView, guards: [AuthGuard]),
+    RouteDef(Routes.plansView, page: PlansView, guards: [AuthGuard]),
+    RouteDef(Routes.logoSettingsView,
+        page: LogoSettingsView, guards: [AuthGuard]),
     RouteDef(Routes.topGraphicsView,
         page: TopGraphicsView, guards: [AuthGuard]),
     RouteDef(Routes.frameSelectionView,
@@ -97,6 +110,24 @@ class Router extends RouterBase {
       );
       return MaterialPageRoute<dynamic>(
         builder: (context) => CategoriesView(key: args.key),
+        settings: data,
+      );
+    },
+    SettingsView: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => SettingsView(),
+        settings: data,
+      );
+    },
+    PlansView: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => PlansView(),
+        settings: data,
+      );
+    },
+    LogoSettingsView: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => LogoSettingsView(),
         settings: data,
       );
     },

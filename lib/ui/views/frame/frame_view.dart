@@ -95,9 +95,9 @@ class _FramesViewState extends State<FramesView> {
                         if (model.userStatic.remainingGraphics != '0') {
                           DialogResponse res = await model.showFinishDiag();
                           if (res.confirmed) {
-                            Directory directory = new Directory("/storage/emulated/0/Pictures/Daily Design");
+                            Directory directory = new Directory("/storage/emulated/0/Pictures");
                             if ((await directory.exists()) != true) {
-                              directory.create();
+                              await directory.create();
                             }
                             File file = new File('${directory.path}/${DateTime.now().microsecondsSinceEpoch}.png');
 
@@ -127,10 +127,6 @@ class _FramesViewState extends State<FramesView> {
           shadowColor: Color(0xff2F4858).withOpacity(0.1),
           title: Row(
             children: [
-              // Text(
-              //   'Daily',
-              //   style: TextStyle(fontFamily: GoogleFonts.montserrat().fontFamily, color: Color(0xff2F4858)),
-              // ),
               Text(
                 'Design',
                 style: TextStyle(fontFamily: GoogleFonts.montserrat().fontFamily, color: Color(0xfff00104)),
@@ -353,24 +349,34 @@ class FrameCard extends StatelessWidget {
                   )),
               Align(
                 alignment: Alignment.center,
-                child: FutureBuilder<Object>(
-                    future: storage.ref(data.path).getDownloadURL(),
-                    builder: (context, snapshot) {
-                      if (snapshot.data != null) {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: Image.network(
-                            snapshot.data,
-                            fit: BoxFit.cover,
-                            height: double.maxFinite,
-                            width: double.maxFinite,
-                          ),
-                        );
-                      } else {
-                        return CircularProgressIndicator(
-                            strokeWidth: 1, valueColor: AlwaysStoppedAnimation(Color(0xff2F4858)));
-                      }
-                    }),
+                child: data.bytes == null
+                    ? FutureBuilder<Object>(
+                        future: storage.ref(data.path).getDownloadURL(),
+                        builder: (context, snapshot) {
+                          if (snapshot.data != null) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: Image.network(
+                                snapshot.data,
+                                fit: BoxFit.cover,
+                                height: double.maxFinite,
+                                width: double.maxFinite,
+                              ),
+                            );
+                          } else {
+                            return CircularProgressIndicator(
+                                strokeWidth: 1, valueColor: AlwaysStoppedAnimation(Color(0xff2F4858)));
+                          }
+                        })
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Image.memory(
+                          base64Decode((data.bytes.replaceAll('data:image/jpeg;base64', ''))),
+                          fit: BoxFit.cover,
+                          height: double.maxFinite,
+                          width: double.maxFinite,
+                        ),
+                      ),
               ),
               Align(
                 alignment: Alignment.bottomLeft,

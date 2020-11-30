@@ -100,6 +100,12 @@ class FirebaseService implements Disposable {
         .set({'logo_path': path}, SetOptions(mergeFields: ['logo_path']));
   }
 
+  removeUserLogo() async {
+    await _firestore
+        .doc('users/' + _authService.fbUserStatic.uid)
+        .set({'logo_path': null}, SetOptions(mergeFields: ['logo_path']));
+  }
+
   Stream<List<CategoryModel>> getCategories() {
     return _firestore
         .collection(CollectionNames.categories)

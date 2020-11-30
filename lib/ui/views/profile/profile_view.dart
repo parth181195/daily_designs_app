@@ -48,57 +48,7 @@ class _ProfileViewState extends State<ProfileView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Center(
-                                child: Container(
-                                  width: 240,
-                                  height: 240,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        PickedFile pickedFile =
-                                            await ImagePicker().getImage(source: ImageSource.gallery);
-                                        await model.uploadImage(pickedFile);
-                                      },
-                                      child: Stack(
-                                        children: [
-                                          Align(
-                                            alignment: Alignment.center,
-                                            child: Container(
-                                              width: 190,
-                                              height: 190,
-                                              child: Center(
-                                                child: Text((model.logoUrl != null && model.logoUrl != '')
-                                                    ? ''
-                                                    : 'Upload Logo'),
-                                              ),
-
-                                              decoration: BoxDecoration(
-                                                  image: DecorationImage(image: NetworkImage(model.logoUrl)),
-                                                  borderRadius: BorderRadius.circular(100)),
-                                              // child:,
-                                            ),
-                                          ),
-                                          Align(
-                                            alignment: Alignment.center,
-                                            child: Container(
-                                              width: 220,
-                                              height: 220,
-                                              // child: Text(
-                                              //     (model.logoUrl != null && model.logoUrl != '') ? '' : 'Upload Logo'),
-
-                                              decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(100),
-                                                  border: Border.all(color: Color(0xff2F4858))),
-                                              // child:,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              // Center(
                               Container(
                                   child: Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -151,7 +101,8 @@ class _ProfileViewState extends State<ProfileView> {
                                 child: Text('Name'),
                               )),
                               ReactiveTextField(
-                                validationMessages: (control) => {'required': 'Name is required'},
+                                validationMessages: (control) =>
+                                    {'required': 'Name is required', 'pattern': 'Enter a valid name'},
                                 onTap: () {
                                   model.setFocusText('name');
                                 },
@@ -197,7 +148,8 @@ class _ProfileViewState extends State<ProfileView> {
                                 child: Text('Website'),
                               )),
                               ReactiveTextField(
-                                validationMessages: (control) => {'required': 'Website  is required'},
+                                validationMessages: (control) =>
+                                    {'required': 'Website  is required', 'pattern': 'Enter a valid website url'},
                                 onTap: () {
                                   model.setFocusText('website');
                                 },
@@ -273,7 +225,11 @@ class _ProfileViewState extends State<ProfileView> {
                                 child: Text('FaceBook URL'),
                               )),
                               ReactiveTextField(
-                                validationMessages: (control) => {'required': 'Facebook url is required'},
+                                validationMessages: (control) => {
+                                  'required': 'Facebook url is required',
+                                  'pattern': 'Enter a valid facebook url',
+                                  'contains': 'Enter a valid facebook url'
+                                },
                                 onTap: () {
                                   model.setFocusText('facebook_url');
                                 },
@@ -297,7 +253,11 @@ class _ProfileViewState extends State<ProfileView> {
                               )),
                               ReactiveTextField(
                                 keyboardType: TextInputType.url,
-                                validationMessages: (control) => {'required': 'Instagram url is required'},
+                                validationMessages: (control) => {
+                                  'required': 'Instagram url is required',
+                                  'contains': 'Enter a valid instagram url',
+                                  'pattern': 'Enter a valid instagram url'
+                                },
                                 onTap: () {
                                   model.setFocusText('instagram_url');
                                 },

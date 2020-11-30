@@ -5,12 +5,13 @@ class FrameModel {
   bool active;
   String name;
   String path;
-  String slug;
   bool isDark;
+  String slug;
+  String bytes;
 
   DocumentReference ref;
 
-  FrameModel({this.isDark, this.public, this.active, this.name, this.path, this.slug, this.ref});
+  FrameModel({this.isDark, this.public, this.active, this.name, this.path, this.slug, this.ref, this.bytes});
 
   factory FrameModel.fromJson(Map<String, dynamic> json, DocumentReference reference) {
     return FrameModel(
@@ -20,6 +21,7 @@ class FrameModel {
         name: json['name'],
         path: json['path'],
         slug: json['slug'],
+        bytes: json['bytes'],
         ref: reference);
   }
 
@@ -30,6 +32,7 @@ class FrameModel {
     data['name'] = this.name;
     data['path'] = this.path;
     data['slug'] = this.slug;
+    data['bytes'] = this.bytes;
     data['is_dark'] = this.isDark;
     return data;
   }

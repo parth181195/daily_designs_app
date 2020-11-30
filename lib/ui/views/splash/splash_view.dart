@@ -15,9 +15,11 @@ class SplashView extends StatefulWidget {
 class _SplashViewState extends State<SplashView> {
   @override
   Widget build(BuildContext context) {
+    print('in splash');
     return ViewModelBuilder<SplashViewModel>.reactive(
       onModelReady: (model) async {
         SchedulerBinding.instance.addPostFrameCallback((_) async {
+          print('in splash');
           await model.init();
         });
       },
@@ -44,23 +46,6 @@ class _SplashViewState extends State<SplashView> {
                       end: Alignment.bottomCenter,
                       stops: [0.6, 1.0])),
             ),
-            // Center(
-            //   child: Column(
-            //     crossAxisAlignment: CrossAxisAlignment.start,
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: [
-            //       Text(
-            //         'Daily',
-            //         style: TextStyle(fontFamily: GoogleFonts.montserrat().fontFamily, fontSize: 50),
-            //       ),
-            //       Text(
-            //         'Designs',
-            //         style: TextStyle(
-            //             fontFamily: GoogleFonts.montserrat().fontFamily, fontSize: 50, color: Color(0xfff00104)),
-            //       ),
-            //     ],
-            //   ),
-            // ),
           ],
         ),
       ),

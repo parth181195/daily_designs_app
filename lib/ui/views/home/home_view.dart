@@ -10,6 +10,9 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:transformer_page_view/transformer_page_view.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import 'dart:convert';
+import 'dart:typed_data';
+
 class HomeView extends StatefulWidget {
   @override
   _HomeViewState createState() => _HomeViewState();
@@ -30,7 +33,7 @@ class _HomeViewState extends State<HomeView> {
               IconButton(
                   icon: Icon(Icons.settings),
                   onPressed: () {
-                    _navigationService.navigateTo(Routes.profileView);
+                    _navigationService.navigateTo(Routes.settingsView);
                   }),
               IconButton(
                   icon: Icon(Icons.exit_to_app),
@@ -189,9 +192,9 @@ class _HomeViewState extends State<HomeView> {
               ),
               SliverGrid.count(
                 childAspectRatio: 1,
-                crossAxisCount: 2,
-                crossAxisSpacing: 5,
-                mainAxisSpacing: 5,
+                crossAxisCount: 3,
+                crossAxisSpacing: 0,
+                mainAxisSpacing: 0,
                 children: List.generate(
                   model.featuredPosts.length,
                   (index) {
@@ -234,24 +237,34 @@ class GraphicCard extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.center,
-            child: FutureBuilder<Object>(
-                future: storage.ref(data.path).getDownloadURL(),
-                builder: (context, snapshot) {
-                  if (snapshot.data != null) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: Image.network(
-                        snapshot.data,
-                        fit: BoxFit.cover,
-                        height: double.maxFinite,
-                        width: double.maxFinite,
-                      ),
-                    );
-                  } else {
-                    return CircularProgressIndicator(
-                        strokeWidth: 1, valueColor: AlwaysStoppedAnimation(Color(0xff2F4858)));
-                  }
-                }),
+            child: data.bytes == null
+                ? FutureBuilder<Object>(
+                    future: storage.ref(data.path).getDownloadURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.data != null) {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: Image.network(
+                            snapshot.data,
+                            fit: BoxFit.cover,
+                            height: double.maxFinite,
+                            width: double.maxFinite,
+                          ),
+                        );
+                      } else {
+                        return CircularProgressIndicator(
+                            strokeWidth: 1, valueColor: AlwaysStoppedAnimation(Color(0xff2F4858)));
+                      }
+                    })
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Image.memory(
+                      base64Decode((data.bytes.replaceAll('data:image/jpeg;base64,', ''))),
+                      fit: BoxFit.cover,
+                      height: double.maxFinite,
+                      width: double.maxFinite,
+                    ),
+                  ),
           ),
           Align(
               alignment: Alignment.bottomLeft,

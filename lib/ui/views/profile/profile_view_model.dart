@@ -25,6 +25,7 @@ class ProfileViewModel extends BaseViewModel {
   User get user => _authService.fbUserStatic;
 
   UserDataModel userData;
+
   FormGroup formGroup;
 
   setFocusText(fieldName) {
@@ -42,21 +43,30 @@ class ProfileViewModel extends BaseViewModel {
     industry.add('Other');
     formGroup = FormGroup({
       'email': FormControl(
-        value: user.email,
-        disabled: true,
+        value: userData.safeEmail,
+        disabled: userData.user.email != null && userData.user.email != '',
         validators: [Validators.required, Validators.email],
       ),
       // 'password': FormControl(value: '123456789', validators: [Validators.required]),
-      'name': FormControl(value: user.displayName, validators: [Validators.required]),
+      'name':
+          FormControl(value: userData.name, validators: [Validators.required,]),
       'mobile': FormControl(value: userData.mobile, validators: [Validators.required, Validators.number]),
       'address': FormControl(value: userData.address, validators: [Validators.required]),
       'companyName': FormControl(value: userData.companyName, validators: [Validators.required]),
       'companyType': FormControl(value: userData.companyType, validators: [
         Validators.required,
       ]),
-      'facebook_url': FormControl(value: userData.facebookUrl, validators: []),
-      'website': FormControl(value: userData.website, validators: []),
-      'instagram_url': FormControl(value: userData.instagramUrl, validators: []),
+      'facebook_url': FormControl(value: userData.facebookUrl, validators: [
+        Validators.pattern(r'^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?'),
+        ContainsValidator('facebook.com').validate
+      ]),
+      'website': FormControl(value: userData.website, validators: [
+        Validators.pattern(r'^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?'),
+      ]),
+      'instagram_url': FormControl(value: userData.instagramUrl, validators: [
+        Validators.pattern(r'^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?'),
+        ContainsValidator('instagram.com').validate
+      ]),
     });
     notifyListeners();
   }
@@ -75,12 +85,39 @@ class ProfileViewModel extends BaseViewModel {
   }
 
   updateUser() async {
-    setBusy(true);
-    UserDataModel payload = UserDataModel.fromJsonData(formGroup.value, _authService.fbUserStatic);
-    payload.name = formGroup.value['name'];
-    payload.logoPath = userData.logoPath;
-    await _firebaseService.updateUserData(payload);
-    notifyListeners();
-    setBusy(false);
+    if (formGroup.valid) {
+      setBusy(true);
+      UserDataModel payload = UserDataModel.fromJsonData(formGroup.value, _authService.fbUserStatic);
+      payload.name = formGroup.value['name'];
+      payload.logoPath = userData.logoPath;
+      await _firebaseService.updateUserData(payload);
+      notifyListeners();
+      setBusy(false);
+    } else {
+      formGroup.markAllAsTouched();
+      notifyListeners();
+    }
+  }
+}
+
+class ContainsValidator extends Validator<dynamic> {
+  final String value;
+
+  /// Constructs an instance of [PatternValidator].
+  ///
+  /// The [value] argument must not be null.
+  ContainsValidator(this.value) : assert(value != null);
+
+  @override
+  Map<String, dynamic> validate(AbstractControl<dynamic> control) {
+    RegExp regex = new RegExp(this.value);
+    return (control.value == null || control.value.toString() == '' || control.value.contains(value))
+        ? null
+        : {
+            ValidationMessage.contains: {
+              'requiredPattern': this.value.toString(),
+              'actualValue': control.value,
+            }
+          };
   }
 }
