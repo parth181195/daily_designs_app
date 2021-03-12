@@ -1,4 +1,4 @@
- import 'dart:typed_data';
+import 'dart:typed_data';
 
 import 'package:daily_design/core/locator.dart';
 import 'package:daily_design/models/category_model.dart';
@@ -63,8 +63,8 @@ class FrameViewModel extends BaseViewModel {
     });
   }
 
-  reduceCredits() async {
-    await _firebaseService.reduceCredits(1);
+  reduceCredits(int amount) async {
+    await _firebaseService.reduceCredits(amount);
   }
 
   changeSelectedFrame(FrameModel frameModel, index) async {
@@ -78,17 +78,16 @@ class FrameViewModel extends BaseViewModel {
 
   showTrialFinishDiag() async {
     await _dialogService.showDialog(
-      title: 'Trail Period Over',
-      description:
-          'Thanks for using Daily Designs Mobile App we will reach out to you when we are launching final product',
+      title: 'Credits Over',
+      description: 'Thanks for using Daily Designs. For further help contact on +919409250794',
       barrierDismissible: true,
     );
   }
 
-  showFinishDiag() async {
+  showFinishDiag(int amount) async {
     return _dialogService.showDialog(
       title: 'Confirm Download',
-      description: 'After Download you will have ${int.parse(userStatic.remainingGraphics) - 1} Credits',
+      description: 'After Download you will have ${int.parse(userStatic.remainingGraphics) - amount} Credits',
       barrierDismissible: true,
     );
   }

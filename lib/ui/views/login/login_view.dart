@@ -142,34 +142,34 @@ class LoginView extends StatelessWidget {
                                   ),
                                 ),
                                 Padding(padding: EdgeInsets.only(bottom: 10)),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                                  child: Flex(
-                                    direction: Axis.horizontal,
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: FlatButton(
-                                          height: 60,
-                                          onPressed: !model.busy('login')
-                                              ? () async {
-                                                  await model.loginWithGoogle();
-                                                }
-                                              : null,
-                                          textColor: Color(0xff2F4858),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                          color: Color(0xffe6eaed),
-                                          child: model.busy('login_google')
-                                              ? CircularProgressIndicator(
-                                                  strokeWidth: 1,
-                                                  valueColor: AlwaysStoppedAnimation(Color(0xff2F4858)),
-                                                )
-                                              : Text('Google'),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                // Padding(
+                                //   padding: const EdgeInsets.symmetric(horizontal: 0),
+                                //   child: Flex(
+                                //     direction: Axis.horizontal,
+                                //     children: [
+                                //       Expanded(
+                                //         flex: 1,
+                                //         child: FlatButton(
+                                //           height: 60,
+                                //           onPressed: !model.busy('login')
+                                //               ? () async {
+                                //                   await model.loginWithGoogle();
+                                //                 }
+                                //               : null,
+                                //           textColor: Color(0xff2F4858),
+                                //           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                //           color: Color(0xffe6eaed),
+                                //           child: model.busy('login_google')
+                                //               ? CircularProgressIndicator(
+                                //                   strokeWidth: 1,
+                                //                   valueColor: AlwaysStoppedAnimation(Color(0xff2F4858)),
+                                //                 )
+                                //               : Text('Google'),
+                                //         ),
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
                                 // GestureDetector(
                                 //   onTap: () {
                                 //     model.goToSignUp();

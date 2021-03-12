@@ -46,7 +46,7 @@ class UserDataModel {
     if (!(user.email != null && user.email != '')) {
       this.email = json['email'];
     }
-    this.plan = json['plan'];
+    // this.plan = json['plan'];
     this.remainingGraphics = json['remaining_graphics'];
     this.mobile = json['mobile'];
     this.address = json['address'];
@@ -100,7 +100,7 @@ class UserDataModel {
 
   toJsonData() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    // data['remaining_graphics'] = this.remainingGraphics;@TESTY.COM,
+    data['remaining_graphics'] = this.remainingGraphics;
     data['email'] = user.email != null && user.email != '' ? this.user.email : this.email;
     data['uid'] = this.user.uid;
     data['mobile'] = this.mobile;

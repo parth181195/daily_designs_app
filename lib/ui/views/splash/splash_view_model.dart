@@ -13,7 +13,7 @@ class SplashViewModel extends BaseViewModel {
   FirebaseService _firebaseService = locator<FirebaseService>();
   MessagingService _messagingService = locator<MessagingService>();
   final AuthService _authService = locator<AuthService>();
-  final version = '1.0.0';
+  final version = '1.0.1';
 
   init() async {
     String ver = await _firebaseService.getVersion();

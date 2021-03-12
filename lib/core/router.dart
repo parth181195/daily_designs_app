@@ -32,7 +32,7 @@ import 'package:daily_design/ui/views/top_graphics/top_graphics_view.dart';
   MaterialRoute(page: FramesView, guards: [AuthGuard]),
   MaterialRoute(page: ProfileView, guards: [AuthGuard]),
   MaterialRoute(page: FilteredGraphicsView, guards: [AuthGuard]),
-  MaterialRoute(page: HomeView, guards: [AuthGuard]),
+  MaterialRoute(page: HomeView, guards: [AuthGuard], maintainState: false),
 ])
 class $Router {}
 

@@ -7,6 +7,7 @@ import 'package:daily_design/models/ad_model.dart';
 import 'package:daily_design/models/category_model.dart';
 import 'package:daily_design/models/frame_model.dart';
 import 'package:daily_design/models/graphics_model.dart';
+import 'package:daily_design/models/industry_model.dart';
 import 'package:daily_design/models/user_data_model.dart';
 import 'package:disposables/disposables.dart';
 
@@ -41,6 +42,25 @@ class FirebaseService implements Disposable {
 
   getVersion() async {
     String version = (await _firestore.collection(CollectionNames.version).get()).docs[0].data()['version'];
+    return version;
+  }
+
+  getIndustryFromId(id) async {
+    // return _firestore
+    //     .collection(CollectionNames.industry)
+    //     .where('name', isEqualTo: id)
+    //     .snapshots()
+    //     .transform(StreamTransformer<QuerySnapshot, List<IndustryModel>>.fromHandlers(
+    //       handleData: (QuerySnapshot data, EventSink sink) {
+    //         var docs = data.docs.map((e) => AdModel.fromJson(e.data(), e.reference)).toList();
+    //         sink.add(docs);
+    //       },
+    //       handleError: (error, stacktrace, sink) {},
+    //       handleDone: (sink) {},
+    //     ));
+    DocumentSnapshot doc =
+        (await _firestore.collection(CollectionNames.industry).where('name', isEqualTo: id).get()).docs[0];
+    IndustryModel version = IndustryModel.fromJson(doc.data(), doc.reference);
     return version;
   }
 
@@ -170,8 +190,34 @@ class FirebaseService implements Disposable {
   }
 
   reduceCredits(int amount) async {
-    await _firestore.doc('users/' + _authService.fbUserStatic.uid).set(
-        {"remaining_graphics": (int.parse(_authService.userStatic.remainingGraphics) - amount).toString()},
-        SetOptions(mergeFields: ['remaining_graphics']));
+    if (_authService.userStatic.remainingGraphics != null) {
+      await _firestore.doc('users/' + _authService.fbUserStatic.uid).set(
+          {"remaining_graphics": (int.parse(_authService.userStatic.remainingGraphics) - amount).toString()},
+          SetOptions(mergeFields: ['remaining_graphics']));
+    } else {
+      _authService.userStatic.remainingGraphics = (int.parse(
+                  _authService.userStatic.remainingGraphics != null ? _authService.userStatic.remainingGraphics : '0') +
+              amount)
+          .toString();
+      await _firestore.doc('users/' + _authService.fbUserStatic.uid).set(
+        {..._authService.userStatic.toJsonData()},
+      );
+    }
+  }
+
+  increaseCredits(int amount) async {
+    if (_authService.userStatic.remainingGraphics != null) {
+      await _firestore.doc('users/' + _authService.fbUserStatic.uid).set(
+          {"remaining_graphics": (int.parse(_authService.userStatic.remainingGraphics) + amount).toString()},
+          SetOptions(mergeFields: ['remaining_graphics']));
+    } else {
+      _authService.userStatic.remainingGraphics = (int.parse(
+                  _authService.userStatic.remainingGraphics != null ? _authService.userStatic.remainingGraphics : '0') +
+              amount)
+          .toString();
+      await _firestore.doc('users/' + _authService.fbUserStatic.uid).set(
+        {..._authService.userStatic.toJsonData()},
+      );
+    }
   }
 }

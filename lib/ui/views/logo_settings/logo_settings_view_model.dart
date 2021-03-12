@@ -18,6 +18,7 @@ import 'package:path/path.dart' as path;
 class LogoSettingsViewModel extends BaseViewModel {
   String focusedField = '';
 
+  final SnackbarService _snackbarService = locator<SnackbarService>();
   final AuthService _authService = locator<AuthService>();
   final NavigationService _navigationService = locator<NavigationService>();
   final FirebaseService _firebaseService = locator<FirebaseService>();
@@ -31,16 +32,19 @@ class LogoSettingsViewModel extends BaseViewModel {
   UserDataModel userData;
 
   init() async {
+    setBusyForObject('logo', true);
     await _authService.getUserObjectFromDbAsFuture(user.uid);
     userData = _authService.userStatic;
     industry = await _firebaseService.getIndustry();
     if (userData.logoPath != null) {
       var url = await storage.ref(userData.logoPath).getDownloadURL();
       logoUrl = await networkImageToByte(url);
-
+      setBusyForObject('logo', false);
       notifyListeners();
       // try {
       // }
+    } else {
+      setBusyForObject('logo', false);
     }
   }
 
@@ -66,6 +70,7 @@ class LogoSettingsViewModel extends BaseViewModel {
       uploadTask.whenComplete(() async {
         userData.logoPath = imageFileName;
         await _firebaseService.changeUserLogo(imageFileName);
+        _snackbarService.showSnackbar(message: 'logo Updated');
         setBusyForObject('file_upload', false);
         notifyListeners();
       });

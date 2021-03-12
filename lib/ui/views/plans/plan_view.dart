@@ -85,7 +85,9 @@ class _PlansViewState extends State<PlansView> {
                                       : Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Text(
-                                            model.userData.remainingGraphics,
+                                            model.userData.remainingGraphics != null
+                                                ? model.userData.remainingGraphics
+                                                : '0',
                                             style: TextStyle(fontSize: 100),
                                           ),
                                         ),
@@ -104,18 +106,25 @@ class _PlansViewState extends State<PlansView> {
                         ),
                         Flexible(
                           child: Card(
+                            elevation: model.purchases.pastPurchases.length == 0 ? 0 : 1,
                             child: Container(
                               width: MediaQuery.of(context).size.width,
                               height: 60,
                               child: InkWell(
-                                onTap: () {},
+                                onTap: model.purchases.pastPurchases.length == 0 ? null : () {},
                                 borderRadius: BorderRadius.circular(4),
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Daily Designs 1 Year Subscription',
+                                      model.purchases.pastPurchases.length == 0
+                                          ? 'No Active Subscription'
+                                          : model.productDetailsSub
+                                              .where((element) =>
+                                                  element.id == model.purchases.pastPurchases.first.productID)
+                                              .first
+                                              .title,
                                       textAlign: TextAlign.start,
                                     ),
                                   ),
@@ -124,6 +133,20 @@ class _PlansViewState extends State<PlansView> {
                             ),
                           ),
                         ),
+                        if (model.purchases.pastPurchases.length != 0)
+                          Flexible(
+                            child: FlatButton(
+                              height: 40,
+                              minWidth: MediaQuery.of(context).size.width,
+                              onPressed: () async {
+                                model.unsubscribe();
+                              },
+                              textColor: Color(0xff2F4858),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              color: Color(0xffe6eaed),
+                              child: Text('Unsubscribe'),
+                            ),
+                          ),
                         Flexible(
                           child: Container(
                               width: MediaQuery.of(context).size.width,
@@ -171,76 +194,78 @@ class _PlansViewState extends State<PlansView> {
                             );
                           }),
                         ),
-                        Flexible(
-                          child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text('Add ons'),
-                              )),
-                        ),
-                        Flexible(
+                        if (model.purchases.pastPurchases.length != 0)
+                          Flexible(
                             child: Container(
-                                height: 60,
                                 width: MediaQuery.of(context).size.width,
-                                child: ListView(
-                                  physics: BouncingScrollPhysics(),
-                                  scrollDirection: Axis.horizontal,
-                                  children: List.generate(model.productDetailsAddons.length, (index) {
-                                    ProductDetails product = model.productDetailsAddons[index];
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text('Add ons'),
+                                )),
+                          ),
+                        if (model.purchases.pastPurchases.length != 0)
+                          Flexible(
+                              child: Container(
+                                  height: 60,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: ListView(
+                                    physics: BouncingScrollPhysics(),
+                                    scrollDirection: Axis.horizontal,
+                                    children: List.generate(model.productDetailsAddons.length, (index) {
+                                      ProductDetails product = model.productDetailsAddons[index];
 
-                                    return Card(
-                                      child: Container(
-                                        height: 60,
-                                        width: 100,
-                                        child: InkWell(
-                                          onTap: () {
-                                            showBottomSheet(product, () async {
-                                              await model.purchaseProduct(product);
-                                            });
-                                          },
-                                          borderRadius: BorderRadius.circular(4),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Center(
-                                                child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                Text(
-                                                  product.skuDetail.title.split('(Daily Designs)')[0],
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                Text(
-                                                  product.skuDetail.price,
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ],
-                                            )),
+                                      return Card(
+                                        child: Container(
+                                          height: 60,
+                                          width: 100,
+                                          child: InkWell(
+                                            onTap: () {
+                                              showBottomSheet(product, () async {
+                                                await model.purchaseProduct(product);
+                                              });
+                                            },
+                                            borderRadius: BorderRadius.circular(4),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Center(
+                                                  child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                children: [
+                                                  Text(
+                                                    product.skuDetail.title.split('(Daily Designs)')[0],
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  Text(
+                                                    product.skuDetail.price,
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
+                                              )),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  }),
-                                  // [
-                                  //   Card(
-                                  //     child: Container(
-                                  //       height: 60,
-                                  //       child: InkWell(
-                                  //         onTap: () {},
-                                  //         borderRadius: BorderRadius.circular(4),
-                                  //         child: Padding(
-                                  //           padding: const EdgeInsets.all(8.0),
-                                  //           child: Center(
-                                  //               child: Text(
-                                  //             '10 Extra Credits',
-                                  //             textAlign: TextAlign.center,
-                                  //           )),
-                                  //         ),
-                                  //       ),
-                                  //     ),
-                                  //   ),
-                                  // ],
-                                ))),
+                                      );
+                                    }),
+                                    // [
+                                    //   Card(
+                                    //     child: Container(
+                                    //       height: 60,
+                                    //       child: InkWell(
+                                    //         onTap: () {},
+                                    //         borderRadius: BorderRadius.circular(4),
+                                    //         child: Padding(
+                                    //           padding: const EdgeInsets.all(8.0),
+                                    //           child: Center(
+                                    //               child: Text(
+                                    //             '10 Extra Credits',
+                                    //             textAlign: TextAlign.center,
+                                    //           )),
+                                    //         ),
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    // ],
+                                  ))),
                       ],
                     ),
                   ),
@@ -269,9 +294,13 @@ class _PlansViewState extends State<PlansView> {
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
-                  child: Text(
-                    product.title,
-                    style: TextStyle(fontSize: 25),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 40,
+                    child: Text(
+                      product.title,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                 ),
               ],

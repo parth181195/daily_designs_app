@@ -8,20 +8,21 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission
-            android:name="android.permission.WRITE_EXTERNAL_STORAGE "/>
+            android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission
-            android:name="android.permission.READ_EXTERNAL_STORAGE "/>
+            android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission
             android:name="android.permission.ACCESS_MEDIA_LOCATION "/>
     <uses-permission android:name="com.android.vending.BILLING"/>
     <application
             android:name=".Application"
             android:label="Daily Design"
+            android:requestLegacyExternalStorage="true"
             android:icon="@mipmap/launcher_icon">
         <activity
                 android:name=".MainActivity"
-                android:requestLegacyExternalStorage="true"
 
+                android:requestLegacyExternalStorage="true"
                 android:launchMode="singleTop"
                 android:theme="@style/LaunchTheme"
                 android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

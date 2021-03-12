@@ -18,6 +18,7 @@ class ProfileViewModel extends BaseViewModel {
   final AuthService _authService = locator<AuthService>();
   final NavigationService _navigationService = locator<NavigationService>();
   final FirebaseService _firebaseService = locator<FirebaseService>();
+  final SnackbarService _snackbarService = locator<SnackbarService>();
   List<String> industry = [];
   FirebaseStorage storage = FirebaseStorage.instance;
   String logoUrl = '';
@@ -48,10 +49,11 @@ class ProfileViewModel extends BaseViewModel {
         validators: [Validators.required, Validators.email],
       ),
       // 'password': FormControl(value: '123456789', validators: [Validators.required]),
-      'name':
-          FormControl(value: userData.name, validators: [Validators.required,]),
+      'name': FormControl(value: userData.name, validators: [
+        Validators.required,
+      ]),
       'mobile': FormControl(value: userData.mobile, validators: [Validators.required, Validators.number]),
-      'address': FormControl(value: userData.address, validators: [Validators.required]),
+      'address': FormControl(value: userData.address, validators: []),
       'companyName': FormControl(value: userData.companyName, validators: [Validators.required]),
       'companyType': FormControl(value: userData.companyType, validators: [
         Validators.required,
@@ -91,6 +93,7 @@ class ProfileViewModel extends BaseViewModel {
       payload.name = formGroup.value['name'];
       payload.logoPath = userData.logoPath;
       await _firebaseService.updateUserData(payload);
+      _snackbarService.showSnackbar(message: 'Profile Updated');
       notifyListeners();
       setBusy(false);
     } else {

@@ -58,6 +58,7 @@ class AuthService implements Disposable {
         autoRetrievedSmsCodeForTesting: '111111',
         verificationCompleted: (PhoneAuthCredential credential) async {
           print(credential);
+          _snackbarService.showSnackbar(message: 'Phone Number Verified');
           userCredential = await _fbAUth.signInWithCredential(credential);
           SignUpRequestModel dataModel = SignUpRequestModel(
               instagramUrl: null,
@@ -67,9 +68,8 @@ class AuthService implements Disposable {
               address: null,
               mobile: number,
               loginDetails: null);
-          verificationCompleted();
           await createUserObjectInDb(userCredential.user, dataModel);
-          _snackbarService.showSnackbar(message: 'Phone Number Verified');
+          verificationCompleted();
         },
         verificationFailed: (FirebaseAuthException e) {
           _snackbarService.showSnackbar(message: 'Phone Number Verification Failed');
@@ -91,41 +91,6 @@ class AuthService implements Disposable {
       print(e);
     }
   }
-
-  loginWithGoogle() async {
-    try {
-      GoogleSignInAccount googleAccount = await _googleSignIn.signIn();
-      GoogleSignInAuthentication signInAuthentication = await googleAccount.authentication;
-      List<String> methods = await _fbAUth.fetchSignInMethodsForEmail(googleAccount.email);
-      if (methods.indexOf('google') == -1) {
-        GoogleAuthCredential credential = GoogleAuthProvider.credential(
-            accessToken: signInAuthentication.accessToken, idToken: signInAuthentication.idToken);
-
-        UserCredential userCredential = await _fbAUth.signInWithCredential(credential);
-        SignUpRequestModel dataModel = SignUpRequestModel(
-            instagramUrl: null,
-            facebookUrl: null,
-            companyType: null,
-            companyName: null,
-            address: null,
-            mobile: null,
-            loginDetails: LoginRequestModel(email: googleAccount.email));
-        await createUserObjectInDb(userCredential.user, dataModel);
-
-        return userCredential.user;
-      } else {
-        GoogleAuthCredential credential = GoogleAuthProvider.credential(
-            accessToken: signInAuthentication.accessToken, idToken: signInAuthentication.idToken);
-        UserCredential userCredential = await _fbAUth.signInWithCredential(credential);
-        await getUserObjectFromDb(userCredential.user.uid);
-        return userCredential.user;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  loginWithFacebook() async {}
 
   login(LoginRequestModel model) async {
     try {
@@ -166,6 +131,10 @@ class AuthService implements Disposable {
     return _userStatic;
   }
 
+  getUserObjectFromDbAsStream(uid) {
+    return _firestore.doc('users/$uid').snapshots();
+  }
+
   checkUserObjectFromDb(uid) async {
     DocumentSnapshot documentSnapshot = await _firestore.doc('users/$uid').get();
     if (documentSnapshot.exists) {
@@ -174,31 +143,107 @@ class AuthService implements Disposable {
     return false;
   }
 
+  loginWithGoogle() async {
+    try {
+      GoogleSignInAccount googleAccount = await _googleSignIn.signIn();
+      GoogleSignInAuthentication signInAuthentication = await googleAccount.authentication;
+      List<String> methods = await _fbAUth.fetchSignInMethodsForEmail(googleAccount.email);
+      if (methods.indexOf('google.com') == -1) {
+        GoogleAuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: signInAuthentication.accessToken, idToken: signInAuthentication.idToken);
+        UserCredential userCredential = await _fbAUth.signInWithCredential(credential);
+        SignUpRequestModel dataModel = SignUpRequestModel(
+            instagramUrl: null,
+            facebookUrl: null,
+            companyType: null,
+            companyName: null,
+            address: null,
+            mobile: null,
+            loginDetails: LoginRequestModel(email: googleAccount.email));
+        await createUserObjectInDb(userCredential.user, dataModel);
+        return userCredential.user;
+      } else {
+        GoogleAuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: signInAuthentication.accessToken, idToken: signInAuthentication.idToken);
+        UserCredential userCredential = await _fbAUth.signInWithCredential(credential);
+        if (await checkUserObjectFromDb(userCredential.user.uid)) {
+          await getUserObjectFromDb(userCredential.user.uid);
+        } else {
+          SignUpRequestModel dataModel = SignUpRequestModel(
+              instagramUrl: null,
+              facebookUrl: null,
+              companyType: null,
+              companyName: null,
+              address: null,
+              mobile: null,
+              loginDetails: LoginRequestModel(email: googleAccount.email));
+          await createUserObjectInDb(userCredential.user, dataModel);
+          await getUserObjectFromDb(userCredential.user.uid);
+        }
+        return userCredential.user;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   createUserObjectInDb(User user, SignUpRequestModel model) async {
     try {
-      QuerySnapshot list = await _firestore.collection('users').where('email', isEqualTo: user.email).get();
-      UserDataModel dataModel = UserDataModel(
-          user: user,
-          plan: 'trial',
-          name: model.name,
-          remainingGraphics: '50',
-          mobile: model.mobile,
-          address: model.address,
-          companyName: model.companyName,
-          companyType: model.companyType,
-          facebookUrl: model.facebookUrl,
-          instagramUrl: model.instagramUrl);
-      if (list.docs.isEmpty) {
-        DocumentReference documentReference = _firestore.doc('users/${user.uid}');
-        await documentReference.set(dataModel.toJson());
-        _userStatic = dataModel;
-      } else {
-        list.docs.forEach((element) async {
-          element.reference.delete();
-        });
-        DocumentReference documentReference = _firestore.doc('users/${user.uid}');
-        _userStatic = dataModel;
-        await documentReference.set(dataModel.toJson());
+      bool isInDb = await checkUserObjectFromDb(user.uid);
+      if (!isInDb) {
+        if (user.email != null) {
+          QuerySnapshot list = await _firestore.collection('users').where('email', isEqualTo: user.email).get();
+          UserDataModel dataModel = UserDataModel(
+              user: user,
+              plan: 'trial',
+              name: model.name,
+              remainingGraphics: '15',
+              mobile: model.mobile,
+              address: model.address,
+              companyName: model.companyName,
+              companyType: model.companyType,
+              facebookUrl: model.facebookUrl,
+              instagramUrl: model.instagramUrl);
+          if (list.docs.isEmpty) {
+            DocumentReference documentReference = _firestore.doc('users/${user.uid}');
+            await documentReference.set(dataModel.toJson());
+            _userStatic = dataModel;
+          } else {
+            list.docs.forEach((element) async {
+              element.reference.delete();
+            });
+            DocumentReference documentReference = _firestore.doc('users/${user.uid}');
+            _userStatic = dataModel;
+            await documentReference.set(dataModel.toJson());
+          }
+        } else {
+          QuerySnapshot list = await _firestore.collection('users').where('mobile', isEqualTo: model.mobile).get();
+          UserDataModel dataModel = UserDataModel(
+              user: user,
+              plan: 'trial',
+              name: model.name,
+              remainingGraphics: '15',
+              mobile: model.mobile,
+              address: model.address,
+              companyName: model.companyName,
+              companyType: model.companyType,
+              facebookUrl: model.facebookUrl,
+              instagramUrl: model.instagramUrl);
+          if (list.docs.isEmpty) {
+            DocumentReference documentReference = _firestore.doc('users/${user.uid}');
+            await documentReference.set(dataModel.toJson());
+            _userStatic = dataModel;
+          } else {
+            if (list.docs.first.reference.id != user.uid) {
+              list.docs.forEach((element) async {
+                element.reference.delete();
+              });
+              DocumentReference documentReference = _firestore.doc('users/${user.uid}');
+              _userStatic = dataModel;
+              await documentReference.set(dataModel.toJson());
+            }
+          }
+        }
       }
     } on FirebaseException catch (e) {
       print(e);

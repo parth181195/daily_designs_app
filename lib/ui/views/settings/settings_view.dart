@@ -79,7 +79,9 @@ class _SettingsVIewState extends State<SettingsView> {
                                       : Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Text(
-                                            model.userData.remainingGraphics,
+                                            model.userData.remainingGraphics != null
+                                                ? model.userData.remainingGraphics
+                                                : '0',
                                             style: TextStyle(fontSize: 100),
                                           ),
                                         ),

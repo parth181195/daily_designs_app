@@ -66,15 +66,18 @@ class _FramesViewState extends State<FramesView> {
             IconButton(
                 icon: Icon(Icons.share),
                 onPressed: () async {
-                  if (model.userStatic.remainingGraphics != '0') {
-                    DialogResponse res = await model.showFinishDiag();
-                    if (res.confirmed) {
-                      var img = await screenshotController.capture(
-                        pixelRatio: 4,
-                      );
-                      await model.reduceCredits();
-                      Share.shareFiles([img.path]);
-                      setState(() {});
+                  if (int.parse(model.userStatic.remainingGraphics) > 0) {
+                    DialogResponse res = await model.showFinishDiag(widget.graphicsModel.credits);
+                    if (res != null) {
+                      if (res.confirmed) {
+                        var img = await screenshotController.capture(
+                          pixelRatio: 4,
+                        );
+                        Share.shareFiles([img.path]).then((value) async {
+                          await model.reduceCredits(widget.graphicsModel.credits);
+                        });
+                        setState(() {});
+                      }
                     }
                   } else {
                     model.showTrialFinishDiag();
@@ -92,26 +95,33 @@ class _FramesViewState extends State<FramesView> {
                       PermissionStatus status = await Permission.mediaLibrary.request();
                       PermissionStatus status1 = await Permission.storage.request();
                       if (status.isGranted && status1.isGranted) {
-                        if (model.userStatic.remainingGraphics != '0') {
-                          DialogResponse res = await model.showFinishDiag();
-                          if (res.confirmed) {
-                            Directory directory = new Directory("/storage/emulated/0/Pictures");
-                            if ((await directory.exists()) != true) {
-                              await directory.create();
-                            }
-                            File file = new File('${directory.path}/${DateTime.now().microsecondsSinceEpoch}.png');
+                        if (int.parse(model.userStatic.remainingGraphics) > 0) {
+                          DialogResponse res = await model.showFinishDiag(widget.graphicsModel.credits);
+                          if (res != null) {
+                            if (res.confirmed) {
+                              // Directory directory = new Directory("/storage/emulated/0/Pictures");
+                              var dirs = await getExternalStorageDirectories();
+                              Directory directory = await getExternalStorageDirectory();
+                              if ((await directory.exists()) != true) {
+                                await directory.create();
+                              }
+                              File file = new File('${directory.path}/${DateTime.now().microsecondsSinceEpoch}.png');
 
-                            final buffer = img.buffer;
-                            var newFile =
-                                await file.writeAsBytes(buffer.asUint8List(img.offsetInBytes, img.lengthInBytes));
-                            await MediaStore.brodcastImage(newFile.path).then((value) async {
-                              print(value);
-                              //   // await model.reduceCredits();
-                              Scaffold.of(context).showSnackBar(SnackBar(content: Text('image downloaded')));
-                            });
-                            // newFile.create().then((value) async {
-                            // });
-                            setState(() {});
+                              final buffer = img.buffer;
+                              // var newFile =
+                              //     await file.writeAsBytes(buffer.asUint8List(img.offsetInBytes, img.lengthInBytes));
+                              if (int.parse(model.userStatic.remainingGraphics) > 0) {
+                                await MediaStore.brodcastImage(buffer.asUint8List(img.offsetInBytes, img.lengthInBytes))
+                                    .then((value) async {
+                                  print(value);
+                                  await model.reduceCredits(widget.graphicsModel.credits);
+                                  Scaffold.of(context).showSnackBar(SnackBar(content: Text('image downloaded')));
+                                });
+                              }
+                              // newFile.create().then((value) async {
+                              // });
+                              setState(() {});
+                            }
                           }
                         } else {
                           model.showTrialFinishDiag();
@@ -187,7 +197,7 @@ class _FramesViewState extends State<FramesView> {
                                 width: 120,
                                 child: Center(
                                   child: Text(
-                                    model.userStatic.name == null ? model.user.displayName : model.userStatic.name,
+                                    model.userStatic.companyName != null ? model.userStatic.companyName : '',
                                     style: TextStyle(
                                       color: !model.frames[model.activeFrame].isDark ? Colors.white : Colors.black,
                                     ),
@@ -371,7 +381,7 @@ class FrameCard extends StatelessWidget {
                     : ClipRRect(
                         borderRadius: BorderRadius.circular(4),
                         child: Image.memory(
-                          base64Decode((data.bytes.replaceAll('data:image/jpeg;base64', ''))),
+                          base64Decode((data.bytes.replaceAll('data:image/png;base64,', ''))),
                           fit: BoxFit.cover,
                           height: double.maxFinite,
                           width: double.maxFinite,

@@ -3,6 +3,7 @@ import 'package:daily_design/core/router.gr.dart';
 import 'package:daily_design/models/ad_model.dart';
 import 'package:daily_design/models/category_model.dart';
 import 'package:daily_design/models/graphics_model.dart';
+import 'package:daily_design/models/industry_model.dart';
 import 'package:daily_design/services/auth_service.dart';
 import 'package:daily_design/services/auth_service.dart';
 import 'package:daily_design/services/auth_service.dart';
@@ -19,20 +20,35 @@ class HomeViewModel extends BaseViewModel {
 
   List<GraphicsModel> featuredPosts = [];
   List<AdModel> featuredAds = [];
+  IndustryModel userIndustry;
 
-  init() {
+  init() async {
     getPosts();
     getAds();
     getCategories();
+    await getUserIndustry();
+    _authService.getUserObjectFromDbAsStream(_authService.fbUserStatic.uid).listen((user) async {
+      getPosts();
+      getAds();
+      getCategories();
+      await getUserIndustry();
+    });
   }
 
   getPosts() {
     _firebaseService.getFeaturedGraphics().listen((event) {
-      // featuredPosts = event.sublist(0, event.length >= 6 ? 6 : event.length);
-      featuredPosts = event.sublist(0, event.length >= 6 ? event.length : event.length);
+      featuredPosts = event.sublist(0, event.length >= 9 ? 9 : event.length);
+      // featuredPosts = event.sublist(0, event.length >= 6 ? event.length : event.length);
       notifyListeners();
       print(event);
     });
+  }
+
+  getUserIndustry() async {
+    if (_authService.userStatic.companyType != null) {
+      userIndustry = await _firebaseService.getIndustryFromId(_authService.userStatic.companyType);
+      notifyListeners();
+    }
   }
 
   logout() async {
@@ -46,6 +62,14 @@ class HomeViewModel extends BaseViewModel {
       notifyListeners();
       print(event);
     });
+  }
+
+  getFestivalCategories() {
+    return categories.where((element) => element.group == 'Festival').toList();
+  }
+
+  getGeneralCategories() {
+    return categories.where((element) => element.group == 'General').toList();
   }
 
   goToCategories() {

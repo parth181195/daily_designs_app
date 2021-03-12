@@ -190,6 +190,7 @@ class Router extends RouterBase {
       return MaterialPageRoute<dynamic>(
         builder: (context) => HomeView(),
         settings: data,
+        maintainState: false,
       );
     },
   };

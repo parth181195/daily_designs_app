@@ -125,10 +125,11 @@ class _LogoSettingsViewState extends State<LogoSettingsView> {
                                             ),
                                           );
                                         },
-                                      ).then((val) {
+                                      ).then((val) async {
                                         if (val != null) {
                                           model.logoUrl = val;
                                           setState(() {});
+                                          await model.uploadImage();
                                           print(val);
                                         }
                                       });
@@ -144,7 +145,10 @@ class _LogoSettingsViewState extends State<LogoSettingsView> {
                                         width: 190,
                                         height: 190,
                                         child: Center(
-                                          child: Text((model.logoUrl != null) ? '' : 'Upload Logo'),
+                                          child: model.busy('logo')
+                                              ? CircularProgressIndicator(
+                                                  strokeWidth: 1, valueColor: AlwaysStoppedAnimation(Color(0xff2F4858)))
+                                              : Text((model.logoUrl != null) ? '' : 'Upload Logo'),
                                         ),
                                         decoration: BoxDecoration(
                                             image: model.logoUrl != null
@@ -159,9 +163,6 @@ class _LogoSettingsViewState extends State<LogoSettingsView> {
                                       child: Container(
                                         width: 220,
                                         height: 220,
-                                        // child: Text(
-                                        //     (model.logoUrl != null && model.logoUrl != '') ? '' : 'Upload Logo'),
-
                                         decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(100),
                                             border: Border.all(color: Color(0xff2F4858))),
@@ -217,7 +218,7 @@ class _LogoSettingsViewState extends State<LogoSettingsView> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             color: !model.busy('file_remove') ? Color(0xffe6eaed) : Color(0xffe6eaed),
                             child: !model.busy('file_remove')
-                                ? Text('Use name as logo')
+                                ? Text('Use company name as logo')
                                 : CircularProgressIndicator(
                                     strokeWidth: 1, valueColor: AlwaysStoppedAnimation(Color(0xff2F4858))),
                           ),

@@ -2,6 +2,7 @@ import 'package:daily_design/core/locator.dart';
 import 'package:daily_design/core/router.gr.dart';
 import 'package:daily_design/models/login_request_model.dart';
 import 'package:daily_design/services/auth_service.dart';
+import 'package:daily_design/services/messaging_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:stacked/stacked.dart';
@@ -10,6 +11,7 @@ import 'package:stacked_services/stacked_services.dart';
 class LoginViewModel extends BaseViewModel {
   String focusedField = '';
   final AuthService _authService = locator<AuthService>();
+  final MessagingService _messagingService = locator<MessagingService>();
   final NavigationService _navigationService = locator<NavigationService>();
   final FormGroup formGroup = FormGroup({
     'mobile': FormControl(
@@ -33,9 +35,9 @@ class LoginViewModel extends BaseViewModel {
             setBusyForObject('login_phone', false);
           },
           codeSent: () {},
-          verificationCompleted: () {
-            _navigationService.replaceWith(Routes.homeView);
-
+          verificationCompleted: () async {
+            await _messagingService.createTokenAndAddToUser(_authService.fbUserStatic.uid);
+            _navigationService.clearStackAndShow(Routes.homeView);
             setBusyForObject('login', false);
             setBusyForObject('login_phone', false);
           },
